@@ -1,4 +1,4 @@
-ARG OMEROPY_VERSION=latest
+ARG OMEROPY_VERSION=1.15.1-python3.11
 FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION as base
 
 RUN groupadd --gid 1000 vscode \
@@ -23,6 +23,6 @@ FROM base as dev
 ENV PATH ~/.local/bin:$PATH
 RUN pip3 install hatch 
 RUN find requirements -name 'requirement*.txt' | while read requirement; do \
-        pip3 install -r "$requirement"; \
+    pip3 install -r "$requirement"; \
     done
 USER vscode
