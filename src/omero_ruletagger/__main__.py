@@ -97,7 +97,7 @@ def create_gateway(conn_params: dict) -> BlitzGateway:
     except ClientError as e:
         try:
             conn.close()
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             pass
         raise ValueError(
             f"Failed to connect to OMERO, likely missing information: {e}"
@@ -107,7 +107,7 @@ def create_gateway(conn_params: dict) -> BlitzGateway:
     if not conn.isConnected():
         try:
             conn.close()
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             pass
         raise ValueError("Failed to connect to OMERO")
 
@@ -240,9 +240,7 @@ def main():
     parser = setup_parser()
     args = parser.parse_args()
 
-    # Set up logging
-    log_level = logging.INFO if args.verbose else logging.WARNING
-    logging.basicConfig(level=log_level)
+    logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING)
 
     conn_params = {
         "username": args.user,
@@ -290,7 +288,7 @@ def main():
             logging.error("Invalid command specified: %s", args.command)
             parser.print_help()
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         logging.error("Error: %s", e)
         exit_code = 1
 
