@@ -1,3 +1,9 @@
+"""OMERO object getter utility class.
+
+This class handles retrieving getter methods for OMERO objects in a case-insensitive manner,
+both singular and plural forms of object names, and unwrapping BlitzObjectWrapper functions.
+"""
+
 from inspect import signature
 from typing import Callable, Union
 
@@ -7,6 +13,18 @@ from omero.gateway import BlitzObjectWrapper
 
 
 class OmeroGetter:
+    """
+    OMERO model getter helper class.
+
+    This class provides utilities to dynamically find and retrieve getter methods
+    for OMERO model objects, handling both singular and plural forms, and dealing
+    with various naming conventions used in the OMERO BlitzObjectWrapper hierarchy.
+
+    The class implements case-insensitive searches and handles wrapped functions
+    in the OMERO object model, making it easier to navigate and access nested
+    OMERO objects programmatically.
+    """
+
     def __init__(self):
         self._ie = inflect.engine()
 

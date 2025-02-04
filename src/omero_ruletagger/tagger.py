@@ -1,3 +1,21 @@
+"""
+A module for automatically tagging OMERO objects based on rules.
+
+This module provides functionality to apply tags to OMERO objects (Projects, Datasets, Images)
+based on predefined rules. It supports both logical rules and regex-based rules, allowing for
+flexible and automated tagging of OMERO objects based on their properties and names.
+
+The module includes the OmeroRuleTagger class which handles the connection to OMERO and
+implements the tagging logic. It supports dry runs for testing rule applications without
+making actual changes to the OMERO database.
+
+Classes
+OmeroRuleTagger
+    Main class that handles the application of tagging rules to OMERO objects.
+
+The implementation prioritizes readability and simplicity over performance.
+"""
+
 import re
 import logging
 from typing import Optional

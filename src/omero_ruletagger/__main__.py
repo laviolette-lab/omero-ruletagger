@@ -1,3 +1,22 @@
+"""OMERO Rule Tagger Command Line Interface.
+
+This module provides a command-line interface for applying tags to OMERO objects
+based on rules defined in a configuration file. It supports validation of rules,
+actual tagging of objects, and dry-run simulation of tagging operations.
+
+The module connects to an OMERO server using either username/password authentication
+or by joining an existing session using a session key. It can process multiple OMERO
+objects (Images, Datasets, or Projects) in a single run.
+
+Features:
+    - Validate rules without applying them
+    - Apply tags to OMERO objects based on rules
+    - Perform dry-run simulations of tag applications
+    - Support for secure connections
+    - Verbose logging option
+    - CSV output for dry-run results
+"""
+
 import argparse
 import logging
 import csv
@@ -10,14 +29,58 @@ from .tagger import OmeroRuleTagger
 from .compiler import get_compiler
 
 
-def write_output(output, output_path):
+def write_output(output: list[list[str]], output_path: str) -> None:
+    """Write CSV output to a file.
+
+    Parameters
+    ----------
+    output : list[list[str]]
+        List of rows, where each row is a list of strings to be written as CSV
+    output_path : str
+        Path to the output CSV file
+
+    Returns
+    -------
+    None
+    """
     with open(output_path, "w", encoding="utf-8") as f:
         writer = csv.writer(f)
         for line in output:
             writer.writerow(line)
 
 
-def create_gateway(conn_params):
+def create_gateway(conn_params: dict) -> BlitzGateway:
+    """Create and return a BlitzGateway connection to OMERO.
+
+    Parameters
+    ----------
+    conn_params : dict
+        Dictionary containing connection parameters:
+        - key : str, optional
+            Session key for joining existing session
+        - host : str
+            OMERO server hostname
+        - port : int
+            OMERO server port
+        - username : str
+            Username for authentication (required if not using session key)
+        - passwd : str
+            Password for authentication (required if not using session key)
+        - try_super : bool, optional
+            Whether to try to connect as administrator
+        - secure : bool, optional
+            Whether to use secure connection
+
+    Returns
+    -------
+    BlitzGateway
+        Connected OMERO gateway object
+
+    Raises
+    ------
+    ValueError
+        If required connection parameters are missing or connection fails
+    """
     if conn_params["key"]:
         ome_client = client(conn_params["host"], conn_params["port"])
         ome_client.joinSession(conn_params["key"])
@@ -52,7 +115,27 @@ def create_gateway(conn_params):
     return conn
 
 
-def parse_omero_object(conn: BlitzGateway, obj_str: str):
+def parse_omero_object(conn: BlitzGateway, obj_str: str) -> tuple[str, str]:
+    """Parse OMERO object string into type and ID.
+
+    Parameters
+    ----------
+    conn : BlitzGateway
+        Connected OMERO gateway object
+    obj_str : str
+        String in format "Type:ID" (e.g. "Image:123")
+
+    Returns
+    -------
+    tuple[str, str]
+        Tuple containing (object_type, object_id)
+
+    Raises
+    ------
+    SystemExit
+        If object string format is invalid, object type is invalid,
+        or object does not exist in OMERO
+    """
     obj_split = obj_str.split(":")
     if len(obj_split) != 2:
         logging.error("Invalid object format: %s", obj_str)
@@ -67,7 +150,14 @@ def parse_omero_object(conn: BlitzGateway, obj_str: str):
     return (obj_type, obj_id)
 
 
-def setup_parser():
+def setup_parser() -> argparse.ArgumentParser:
+    """Set up command line argument parser.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Configured argument parser with all command line options
+    """
     parser = argparse.ArgumentParser(
         prog="OMERO.RuleTagger", description="OMERO.RuleTagger CLI"
     )
@@ -112,6 +202,41 @@ def setup_parser():
 
 
 def main():
+    """Main entry point for the OMERO Rule Tagger command line application.
+
+    This function handles command line argument parsing, logging setup, OMERO connection management,
+    and execution of the specified command (validate, run, or dry-run).
+
+    Notes
+    -----
+    The function performs the following main tasks:
+        1. Parses command line arguments
+        2. Sets up logging based on verbosity
+        3. Establishes connection to OMERO server
+        4. Executes the requested command
+        5. Handles errors and cleanup
+
+    Returns
+    -------
+    None
+        The function exits with code 0 on success, 1 on error
+
+    Raises
+    ------
+    Exception
+        Any exceptions during execution are caught, logged, and result in exit code 1
+
+    Parameters
+    ----------
+    None
+        All parameters are obtained from command line arguments through argparse
+
+    Examples
+    --------
+    $ python -m omero_ruletagger validate rules.yml
+    $ python -m omero_ruletagger run rules.yml --object "Image:123"
+    $ python -m omero_ruletagger dry-run rules.yml -O "Dataset:456" -o results.csv
+    """
     parser = setup_parser()
     args = parser.parse_args()
 

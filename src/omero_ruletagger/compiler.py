@@ -260,12 +260,12 @@ class Schema0Compiler:
                 root_object = defined_root_object
             if root_object != defined_root_object:
                 raise ValueError(
-                    f"Logical tag rule has multiple root objects! Use parent or child attributes to climb up or down if needed! Rule: {rule}"
+                    f"Logical tag rule has multiple root objects! Use parent or child attributes to climb up or down if needed! Rule: {rule}"  # pylint: disable=line-too-long
                 )  # pylint: disable=line-too-long
             # ensure all conditions are legal
             if not "operation" in condition:
                 raise ValueError(
-                    f"Logical tag rule is missing operation! (kind of the whole purpose) Rule: {rule}"
+                    f"Logical tag rule is missing operation! No default for ops! Rule: {rule}"
                 )  # pylint: disable=line-too-long
             if condition["operation"] not in LogicalOperator.OPERATIONS:
                 raise ValueError(
@@ -284,7 +284,7 @@ class Schema0Compiler:
         # ensure root object is a supported object
         if root_object.lower() not in ["project", "dataset", "image"]:
             raise ValueError(
-                f"Logical tag rule has unsupported root object! Can only tag Projects, Datasets, or Images! Rule: {rule}"
+                f"Logical tag rule has unsupported root object! Can only tag Projects, Datasets, or Images! Rule: {rule}"  # pylint: disable=line-too-long
             )  # pylint: disable=line-too-long
 
     def compile_logical_rule(self, tag_rule: dict, path: dict):
@@ -327,7 +327,7 @@ class Schema0Compiler:
                     # if errors on last step, we can allow it
                     if attribute == conditional["attribute_path"][-1]:
                         logging.warning(
-                            "Last attribute in logical rule not found, but will be allowed. Rule: %s",
+                            "Last attribute in logical rule not found but that's allowed. Rule: %s",
                             tag_rule,
                         )
                         break
@@ -359,6 +359,42 @@ class Schema0Compiler:
         )
 
     def compile(self, ids: list[tuple[str, int]] = None):
+        """Compile tagging rules into a format suitable for processing.
+
+        This method transforms the tagging rules into a structured format that can be applied
+        to OMERO objects. It handles both capture rules and logical rules, and can target
+        specific objects if IDs are provided.
+
+        Parameters
+        ----------
+        ids : list[tuple[str, int]], optional
+            List of tuples containing object type and ID pairs to apply rules to.
+            Each tuple should contain ('object_type', object_id).
+            Supported object types are 'project', 'dataset', and 'image'.
+            If None, rules will be applied to all projects.
+
+        Returns
+        -------
+        list[dict]
+            List of compiled rule dictionaries. Each dictionary contains:
+            - project/dataset/image: int (object ID)
+            - path: dict (hierarchical path structure)
+            - regex: list (compiled regex patterns)
+
+        Raises
+        ------
+        ValueError
+            If an unsupported object type is provided or
+            if strict mode is enabled and a specified object doesn't exist.
+
+        Notes
+        -----
+        The method performs the following steps:
+        1. Compiles the initial path structure
+        2. Processes capture and logical rules
+        3. Creates compiled rule sets for specified objects or all projects
+        4. Validates object existence (if strict mode is enabled)
+        """
         tagging_rules = self.tagging_rules
         compiled = {"path": self._format_initial_path(), "regex": []}
         for rule in tagging_rules:
