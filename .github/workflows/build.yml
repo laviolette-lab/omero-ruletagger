@@ -16,7 +16,7 @@ jobs:
     - name: Build wheel with hatch 
       run: docker run --rm -v "${{ github.workspace }}:/app" myapp:hatch build
     - name: Upload wheel
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wheel
         path: dist/*.whl
