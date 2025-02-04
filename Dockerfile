@@ -1,4 +1,4 @@
-ARG OMEROPY_VERSION=1.15.1-python3.11
+ARG OMEROPY_VERSION=1.1.5-python3.11
 FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION as base
 
 RUN groupadd --gid 1000 vscode \
