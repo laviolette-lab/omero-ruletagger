@@ -12,7 +12,7 @@ import inflect
 from omero.gateway import BlitzObjectWrapper
 
 
-class OmeroGetter:
+class OmeroGetter:  # pylint: disable=too-few-public-methods
     """
     OMERO model getter helper class.
 
