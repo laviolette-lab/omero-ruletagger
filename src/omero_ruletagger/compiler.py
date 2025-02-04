@@ -18,7 +18,7 @@ from .getter import OmeroGetter
 from .logic import LogicalOperator
 
 
-class Schema0Compiler:
+class Schema0Compiler:  # pylint: disable=too-many-instance-attributes
     """Compiles the original yaml design into the dict defined in designs/compiled_rules.jsonc"""
 
     BASE_STEP = {"object": "", "getter": None, "rules": [], "children": []}
@@ -451,19 +451,19 @@ class Schema0Compiler:
             rule_errors = []
             try:
                 self._ensure_rule_type_exclusivity(rule)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 rule_errors.append(e)
             try:
                 if rule.get("capture"):
                     self._validate_capture_rule(rule)
                     self.compile_capture_rule(rule)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 rule_errors.append(e)
             try:
                 if rule.get("rules"):
                     self._validate_logical_rule(rule)
                     self.compile_logical_rule(rule, path)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 rule_errors.append(e)
             if rule_errors:
                 errors.update({f"rule_{i}": rule_errors})
