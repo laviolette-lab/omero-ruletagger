@@ -1,0 +1,9 @@
+dist
+.*
+!.git
+!.github
+!.gitignore
+!.devcontainer
+__pycache__
+tags.csv
+*.prof

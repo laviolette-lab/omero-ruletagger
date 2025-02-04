@@ -1,0 +1,21 @@
+site_name: Omero Autotagger
+theme:
+  name: material
+
+plugins:
+  - mkdocstrings
+  - git-revision-date-localized
+  - minify:
+      minify_html: true
+  - autorefs
+
+nav:
+  - Home: index.md
+  - Getting Started: 
+    - Installation: installation.md
+    - Requirements: requirements.md
+  - Usage: usage.md
+  - Tagging Rules:
+    - Attribute-Based Tagging: attribute.md 
+    - Capture-Based Tagging: capture.md 
+  - Python Patch Script: patch.md

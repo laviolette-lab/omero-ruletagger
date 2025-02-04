@@ -1,0 +1,95 @@
+all:
+  include:
+  exclude:
+  additive:
+    - capture: "([^_.]+)"
+      blacklist:
+        - Large
+        - Deeper
+        - Deeper2
+        - Deeper3
+        - Deeper4
+        - 2
+        - 3
+        - 4
+  subtractive:
+    - name: Priority
+      rules:
+        - attribute_path: ["image", "roicount"]
+          operation: gt
+          value: 0
+
+groups:
+  - id: 1
+    include:
+    exclude:
+    additive:
+      - name: Annotate
+        rules:
+          - attribute_path: ["image", "roicount"]
+            operation: lt
+            value: 1
+      - name: Finished
+        rules:
+          - attribute_path: ["image", "roicount"]
+            operation: gt
+            value: 0
+      - name: "Transferred_ROIs"
+        rules:
+          - attribute_path: ["image", "roi", "description"]
+            operation: eq
+            value: "Transferred Annotation"
+      - name: "Benign_Atrophy"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: 255
+      - name: "Seminal_Vesicles"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: 420806655
+      - name: "HGPIN"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: -8781569
+      - name: "Corpora"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: -15728385
+      - name: "Grade_3"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: 822031103
+      - name: "Grade_4_FG"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: -387841
+      - name: "Grade_4_CG"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: -32047105
+      - name: "Grade_5"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: 570425343
+      - name: "Vessel"
+        rules:
+          - attribute_path: ["image", "roi", "shape", "strokecolor"]
+            operation: eq
+            value: -1245970945
+
+projects:
+  - id: 1
+    additive:
+      - name: PROSTATE
+        rules:
+          - attribute_path: ["image"]
+            operation: always
+            value: "PROSTATE"

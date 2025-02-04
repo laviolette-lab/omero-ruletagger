@@ -1,0 +1,54 @@
+[
+    {
+        "project": 1, // project id
+        "path": {
+            "object": "project",
+            "getter": "GETTER_FUNCTION", // 
+            "rules": [],
+            "children": [ // in case we need to add support for tagging HCS objects
+                {
+                    "object": "dataset",
+                    "getter": "GETTER_FUNCTION",
+                    "rules": [],
+                    "children": [
+                        {
+                            "object": "image",
+                            "getter": "GETTER_FUNCTION",
+                            "rules": [
+                                {
+                                    "name": "TagName",
+                                    "remove": false,
+                                    "absolue": false,
+                                    "conditions": [
+                                        {
+                                            "path": [
+                                                "GETTER_FUNCTION_1",
+                                                "GETTER_FUNCTION_2"
+                                            ],
+                                            "operation": "ge",
+                                            "invert": false,
+                                            "value": 0
+                                        }
+                                    ]
+                                }
+                            ],
+                            "children": [] // probably needed to avoid requesting the same object multiple times
+                        }
+                    ]
+                }
+            ]
+        },
+        "regex": [
+            {
+                "capture": "$COMPILED_REGEX",
+                "blacklist": [
+                    "Large",
+                    1
+                ],
+                "objects": [
+                    "image"
+                ]
+            } // , ...
+        ]
+    } // , ...
+]

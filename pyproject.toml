@@ -1,0 +1,131 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "omero-autotagger"
+dynamic = ["version"]
+description = 'Define rules that create tags in an omero server.'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "barrettMCW", email = "mjbarrett@mcw.edu" },
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+dependencies = [
+  "pyyaml",
+  "inflect",
+ "omero-py"
+]
+
+[project.urls]
+Documentation = "https://github.com/LavLabInfrastructure/omero-autotagger#readme"
+Issues = "https://github.com/LavLabInfrastructure/omero-autotagger/issues"
+Source = "https://github.com/LavLabInfrastructure/omero-autotagger"
+
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+path = "src/omero_autotagger/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/omero_autotagger"]
+
+[tool.hatch.env]
+requires = [
+    "hatch-pip-compile"
+]
+
+[tool.hatch.envs.default]
+type = "pip-compile"
+pip-compile-hashes = true
+dependencies = []
+
+[tool.hatch.envs.default.scripts]
+it = "hatch build && chmod -R 777 dist/*"
+build = "hatch build && chmod -R 777 dist/*"
+
+[tool.hatch.envs.test]
+dependencies = [
+  "pytest",
+  "pytest-cov",
+  "coverage[toml]>=6.2"
+]
+[tool.hatch.envs.test.scripts]
+it = "pytest --cov=src --cov-report=term-missing {args:tests}"
+test = "pytest {args:tests}"
+cov = "pytest --cov=src --cov-report=term-missing {args:tests}"
+
+[tool.hatch.envs.lint]
+dependencies = [
+  "pytest",
+  "pylint",
+  "black"
+]
+[tool.hatch.envs.lint.scripts]
+it = "black src tests && pylint src tests"
+lint = "pylint src tests"
+format = "black src tests"
+check = "black src tests --check"
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+  "types-pyyaml",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/omero_autotagger tests}"
+it = "mypy --install-types --non-interactive {args:src/omero_autotagger tests}"
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs",
+  "mkdocstrings",
+  "mkdocs-material",
+  "mkdocs-autorefs",
+  "mkdocs-minify-plugin",
+  "mkdocs-material-extensions",
+  "mkdocs-git-revision-date-localized-plugin"
+]
+[tool.hatch.envs.docs.scripts]
+it = "mkdocs build"
+build-docs = "mkdocs build"
+serve-docs = "mkdocs serve"
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.coverage.run]
+source_pkgs = ["src/omero_autotagger", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/omero_autotagger/__about__.py",
+]
+
+[tool.coverage.paths]
+omero_autotagger = ["src/omero_autotagger", "*/omero-autotagger/src/omero_autotagger"]
+tests = ["tests", "*/omero-autotagger/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
