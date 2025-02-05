@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: omero-autotagger-cronjob
+  name: omero-ruletagger-cronjob
 spec:
   schedule: "0 0 * * *"
   jobTemplate:
@@ -9,14 +9,14 @@ spec:
       template:
         spec:
           containers:
-            - name: autotagger
-              image: ghcr.io/lavlabinfrastructure/omero-autotagger:1.0.0
+            - name: ruletagger
+              image: ghcr.io/laviolette-lab/omero-ruletagger:1.0.0
               imagePullPolicy: IfNotPresent
               command:
                 - "/bin/sh"
               args:
                   - '-c'
-                  - "python3 /app/src/omero_autotagger/__main__.py /config/tag_rules.yml --patch /config/patch.py -s  ${OMERO_SERVER} -p  ${OMERO_PORT:-4064} -u  ${OMERO_USERNAME} -w  ${OMERO_PASSWORD} $([ ! -z $OMERO_SECURE ] && echo '-S')"
+                  - "python3 /app/src/omero_ruletagger/__main__.py /config/tag_rules.yml --patch /config/patch.py -s  ${OMERO_SERVER} -p  ${OMERO_PORT:-4064} -u  ${OMERO_USERNAME} -w  ${OMERO_PASSWORD} $([ ! -z $OMERO_SECURE ] && echo '-S')"
   
               env:
                 - name: "OMERO_USERNAME"
@@ -49,4 +49,4 @@ spec:
           volumes:
             - name: config-volume
               configMap:
-                name: omero-autotagger-config
+                name: omero-ruletagger-config

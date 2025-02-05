@@ -1,5 +1,5 @@
 """
-Compiles a schema into a set of rules for the autotagger.
+Compiles a schema into a set of rules for the tagger.
 See rules.yml for an example input and designs/compiled_rules.jsonc for an example output
 """
 
@@ -207,10 +207,10 @@ class Schema0Compiler:  # pylint: disable=too-many-instance-attributes
 
     def compile_capture_rule(self, rule: dict):
         """
-        Compiles a capture rule dictionary into a format suitable for the autotagger.
+        Compiles a capture rule dictionary into a format suitable for the tagger.
 
         This function compiles the provided capture rule dictionary into a format suitable
-        for the autotagger. The compiled rule will contain the 'capture' key with the compiled
+        for the tagger. The compiled rule will contain the 'capture' key with the compiled
         regex pattern, and the 'format' key with the format string if it is present in the
         original rule. If the 'format' key is not present, it will be set to None.
 

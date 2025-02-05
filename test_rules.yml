@@ -9,11 +9,8 @@
       value: 1
 
 - name: "TRUE"
-  # absolute: false
-  # type: subtractive
   rules:
     - attribute_path: ["image", "roi", "count"]
-      # invert: true
       operation: gt
       value: 0
 

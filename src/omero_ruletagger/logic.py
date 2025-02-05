@@ -1,5 +1,5 @@
 """
-A class for handling logical operations in the autotagger.
+A class for handling logical operations in the tagger.
 
 This class provides a collection of logical operations for comparing values and 
 evaluating conditions. It includes standard comparison operators as well as
@@ -10,7 +10,7 @@ import re
 
 
 class _LogicalOperator:
-    """Handles logical operations for the autotagger."""
+    """Handles logical operations for the tagger."""
 
     OPERATIONS = {
         "gt": lambda a, b: a > b,

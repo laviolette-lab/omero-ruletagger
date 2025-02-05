@@ -1,4 +1,4 @@
-site_name: Omero Autotagger
+site_name: OMERO.RuleTagger
 theme:
   name: material
 

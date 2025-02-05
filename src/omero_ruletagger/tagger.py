@@ -294,7 +294,7 @@ class OmeroRuleTagger:  # pylint: disable=too-many-instance-attributes
             Name of tag to get.
         remove : bool
             Whether or not we intend on removing this tag.
-            Important for removing tags not created by autotagger.
+            Important for removing tags not created by autotagging.
 
         Returns
         -------
@@ -305,7 +305,7 @@ class OmeroRuleTagger:  # pylint: disable=too-many-instance-attributes
         group_tag_map = self.tag_map.get(gid, {})
         if tag_name in group_tag_map:
             return group_tag_map[tag_name]
-        # you can remove tags that aren't from autotagger
+        # you can remove tags that aren't from autotagging
         # so if remove and tag doesn't exist, return None,
         # handled later in _apply_tag
         if remove:
