@@ -1,147 +1,162 @@
-# OMERO.AutoTagger
+[![PyPI version](https://badge.fury.io/py/omero-ruletagger.svg)](https://badge.fury.io/py/omero-ruletagger)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Python Versions](https://img.shields.io/pypi/pyversions/omero-ruletagger.svg)](https://pypi.org/project/omero-ruletagger/)
+# OMERO.RuleTagger (Previously Known as [OMERO.Autotagger](https://github.com/LavLabInfrastructure/omero-autotagger))
 
-## Description
-OMERO.AutoTagger is a utility that allows you to define a set of tagging rules in a YAML file. These rules are then used to traverse the OMERO object model. Each parent object (primarily images) and its children are checked to see if they match a set of parameters. If a match is found, the image is tagged with the corresponding tag name. A very common use case is tagging images based on the number of ROIs.
+A Python package for automated tagging of OMERO objects based on customizable rules and regex.
 
-## Requirements
-- Python 3.8 or above
-- Python packages: `pyyaml`, `inflect`, `omero-py`
+It works by walking the omero model as described by the omero-py wrappers and the underlying ObjectI classes. After the walk it compares a given reference value against the value it walked to, then tags if the condition passes.
 
-These dependencies can be installed via pip:
-```sh
-pip3 install omero-py PyYAML inflect
+## Known Limitations
+* Currently impossible to add arguments to the model walk
+  * For example a you can't filter a condition to only check annotations in a certain namespace
+  * This example could be fixed by comparing the 'ns' property against the desired value, but it still won't filter 
+* Cannot specify objects to operate on within the rules file.
+  * Planned addition in schemav2 but wanted to get this out and get some feedback for schemav2
+* Doesn't handle Annotations very well.
+  * This is because the omero-py package doesn't have getters for specific annotation types
+    * This causes AttributeErrors
+  * Map and Table Annotations especially need extra thought to be able to meaningfully rule against
+* Also doesn't handle properties
+  * Due to the compilation process, we need getters to access properties
+  * Could be possible to add with some lambda
+    * Decided to leave as is for now because most properties have a getter (thanks java!)
+* Pretty slow and inefficient
+  * Makes more requests than it needs to
+  * Causes it to take longer than it needs to
+  * Decided to leave as is for readability sake
+    * We run it once a night, could probably do it once a week
+    * Both walking and recursion can get complex, tried my best to stay legible (unlike my first implementation)
+    
+## Documentation
+For a proper in-depth explanation of the tool use the [documentation.](https://omero-ruletagger.readthedocs.io/en/stable)
+
+## Installation
+
+Install using pip:
+
+```bash
+pip install omero-ruletagger
 ```
-zeroc-ice, an omero-py dependency, is troublesome on apple silicon, installing our lavlab-python-utils package streamlines the installation process
-```sh
-python3 -m pip install https://github.com/laviolette-lab/lavlab-python-utils/releases/latest/download/lavlab_python_utils-latest-py3-none-any.whl
-python3 -m pip install 'lavlab-python-utils[all]'
-python3 -m pip install inflect
-```
+
+### Dependencies
+
+- Python ≥3.8  
+- PyYAML  
+- inflect  
+- omero-py  
 
 ## Usage
 
-1. Define your tag rules in a YAML file. See the provided example file for the required structure and syntax.
+### Command Line Interface
 
-2. Run the script from the command line using the following syntax:
-### From Install: (pypi coming soon)
-```
-python3 -m omero_autotagger <path to tag_rules.yml> [path to patch.py] -s <server> -p <port> -u [user] -w [password] -S [secure] --session [session_key]
-```
-### From Source:
-```
-python3 src/omero_autotagger <path to tag_rules.yml> [path to patch.py] -s <server> -p <port> -u [user] -w [password] -S [secure] --session [session_key]
+The package provides three main commands:
+
+1. Validate rules:
+
+```bash
+omero-ruletagger validate rules.yml
 ```
 
-Here is a brief explanation of each argument:
+2. Apply tags:
 
-- `tag_rules.yml`: Required. Path to the YAML file containing the tagging rules to be applied.
-- `patch.py`: Path to the Python patch script to use for tagging.
-- `server`: Required. Address of the OMERO server to connect to.
-- `port`: Required. Port number of the OMERO server to connect to.
-    * With the increased adoption of OMERO API over websockets, we decided to make this required, may be assumed in future updates.
-- `user`: Username for the OMERO server. This is required if no session key is provided.
-- `password`: Password for the OMERO server. This is required if no session key is provided.
-- `secure`: Establishes a secure connection to the server. If not specified, a secure connection is used to login and then switched to unsecure by default.
-- `session`: Session key to use for connecting to the server. If this is provided, username and password will be ignored.
-
-## Example Usage
-
-Given a YAML file `tag_rules.yaml` and patch script `patch.py`:
-
-```
-python3 -m omero_autotagger rules.yml patch.py -s myserver.com -p 4064 -u myuser -w mypassword
+```bash
+omero-ruletagger run rules.yml -O "Image:123" -O "Dataset:456"
 ```
 
-Or using a session key:
+3. Dry run:
 
+```bash
+omero-ruletagger dry-run rules.yml -O "Image:789" -o results.csv
 ```
-python3 -m omero_autotagger rules.yml patch.py -s myserver.com -p 4064 --session mysesskey
-```
 
-This will establish a connection to the specified OMERO server, load the tagging rules from the provided YAML file, apply these rules using the provided patch script (if any), and tag the images accordingly.
+### Connection Options
 
-## YAML Rules Structure for Capture Based Tagging
+- `-s`, `--server`: OMERO server hostname  
+- `-p`, `--port`: OMERO server port  
+- `-u`, `--user`: OMERO username  
+- `-w`, `--password`: OMERO password  
+- `-k`, `--key`: Existing session key  
+- `-S`, `--secure`: Use secure connection  
+- `--sudo`: Connect as administrator  
+- `-v`, `--verbose`: Enable verbose logging  
 
-For capture-based tagging, your YAML file can include rule sets that define the following parameters:
+### Rule Configuration
 
-- `capture`: A string that specifies a regular expression (Python flavor). This expression is used to capture specific groups of text from object names, which will then be used as tags. For instance, `([^_.]+)` will capture all underscore-delimited groups from names and tag them separately.
-
-- `include_extension`: An optional boolean value. If set to `True`, the file extension will be included in the capture process. If set to `False`, or omitted, the extension will be trimmed before applying the regex.
-
-- `object`: An optional string that specifies the type of the object to tag. If omitted, the default object type is 'Image'.
-
-- `format`: An optional string that serves as a Python format template. It's used for formatting the captured group before tagging. If omitted, the default is no formatting.
-
-- `blacklist`: An optional list of string values. If a captured value matches any value in the blacklist, it will not be used as a tag.
-
-Here is an example:
+Create a YAML file defining your tagging rules. Example:
 
 ```yaml
-- capture: "([^_.]+)"
-  include_extension: False
-  object: 'image'
-  format: '{}'
+# test_rules.yml
+- capture: "([^-.]+)"
   blacklist:
-    - Large
-    - Deeper
-    - Deeper2
-    - Deeper3
-    - Deeper4  
-```
+    - 1
 
-In this example, any text that is separated by underscores or periods in the names of image files will be captured and used as a tag, except for the terms listed in the blacklist.
-
-## YAML Rules Structure for Attribute Based Tagging
-
-For attribute-based tagging, your YAML file can include rule sets that define the following parameters:
-
-- `name`: A string that specifies the name of the tag to apply.
-
-- `absolute`: An optional boolean value. If set to `True`, the tag will be unset if the rules are not fulfilled. If omitted, the default is `True`.
-
-- `rules`: A list of dictionaries, where each dictionary includes the following keys:
-
-    - `attribute_path`: A list of strings that specifies the hierarchical path to the attribute that should be checked.
-    
-    - `operation`: A string that specifies the comparison operation to use. It can be one of the following: eq (equal), ne (not equal), gt (greater than), ge (greater than or equal), lt (less than), le (less than or equal), or match (regex match).
-    
-    - `value`: Specifies the value to compare the attribute value against. It can be any data type that is appropriate for the operation being performed.
-
-Here is an example:
-
-```yaml
-- name: Annotate 
-  absolute: True
+- name: "FALSE"
   rules:
-    - attribute_path: ["image","roicount"]
+    - attribute_path: ["image", "roicount"]
       operation: lt
       value: 1
+
+- name: "TRUE"
+  rules:
+    - attribute_path: ["image", "roi", "count"]
+      operation: gt
+      value: 0
+
+- name: "Subtractive"
+  absolute: false
+  type: subtractive
+  rules:
+    - attribute_path: ["image", "roi","count"]
+      operation: gt
+      value: 0
+
+- name: "UselessAND_TRUE"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 255
+    - attribute_path: ["image", "roi", "shape", "count"]
+      operation: eq
+      value: 1
+
+- name: "InherentlyFalseAND"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 255
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 254
+
+- name: "DescriptionTest"
+  rules:
+    - attribute_path: ["image", "descriptions"]
+      operation: match
+      value: ".*test.*"
+
+- name: "PhysicalSizeTest"
+  rules:
+    - attribute_path: ["image", "primarypixel", "physicalsizex"]
+      operation: eq
+      value: 1000
+    - attribute_path: ["image", "primarypixel", "physicalsizey"]
+      operation: eq
+      value: 1000
+    - attribute_path: ["image", "primarypixel", "physicalsizex", "unit", "name"]
+      operation: eq
+      value: "MICROMETER"
 ```
 
-In this example, the tag `Annotate` will be applied to any image that has a "roiCount" of 0. If the image's "roi count" is more than 1, the tag `Annotate` will be removed (since `absolute` is `True`). While generated collection attributes may be useful, the logic has not been implemented. instead patch your desired parent object to have a getter for that attribute. (see below)
-## Python Patch Script
 
-The `patch.py` file should be a Python script that contains definitions for custom methods. These methods are intended to be added to OMERO gateway wrapper classes to extend their functionality. This is commonly known as "monkey patching".
+## Contributing
 
-Here's a basic outline of how you can structure your `patch.py`:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```python
-def getROIs(self):
-    # This is just a placeholder. Replace the code here with whatever functionality.
-    pass
+## License
 
-def getOtherAttributes(self):
-    # Another placeholder function. Add your code here.
-    pass
+This project is licensed under the MIT License - see the [`LICENSE.txt`](LICENSE.txt) file for details.
 
-# Assign the new methods to the relevant OMERO classes
-import omero.gateway
-omero.gateway.ImageWrapper.getROIs = getROIs
-omero.gateway.ImageWrapper.getOtherAttributes = getOtherAttributes
-```
+## Links
 
-In the script above, we define two methods: `getROIs()` and `getOtherAttributes()`. Each of these methods should only accept `self` as a parameter, meaning they are instance methods.
-
-We then assign these methods to the `ImageWrapper` class of the `omero.gateway` module, thereby extending the functionality of this class. When instances of this class are used within the OMERO.AutoTagger application, they will now have access to these additional methods.
-
-Ensure your patch script is tailored to your requirements and correctly interfaces with the existing OMERO objects you are working with.
+- [Documentation](https://github.com/laviolette-lab/omero-ruletagger#readme)  
+- [Source Code](https://github.com/laviolette-lab/omero-ruletagger)  
+- [Issue Tracker](https://github.com/laviolette-lab/omero-ruletagger/issues)
