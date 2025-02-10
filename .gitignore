@@ -4,6 +4,7 @@ dist
 !.github
 !.gitignore
 !.devcontainer
+!.readthedocs.yaml
 __pycache__
 tags.csv
 *.prof
