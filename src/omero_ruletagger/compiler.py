@@ -493,6 +493,6 @@ def get_compiler(rule_path: str, conn: BlitzGateway) -> Schema0Compiler:
 
     if "version" not in rules:
         return Schema0Compiler(conn, rules)
-    if rules["version"] == 1:
+    if rules["version"] == "v1":
         return Schema1Compiler(conn, rules)
     raise ValueError(f"Unsupported version {rules['version']}!")
