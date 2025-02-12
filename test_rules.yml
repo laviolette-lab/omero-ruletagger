@@ -1,59 +1,61 @@
-- capture: "([^-.]+)"
-  blacklist:
-    - 1
+version: v1
+tag_rules:
+  - capture: "([^-.]+)"
+    blacklist:
+      - 1
 
-- name: "FALSE"
-  rules:
-    - attribute_path: ["image", "roicount"]
-      operation: lt
-      value: 1
+  - name: "FALSE"
+    rules:
+      - attribute_path: ["image", "roicount"]
+        operation: lt
+        value: 1
 
-- name: "TRUE"
-  rules:
-    - attribute_path: ["image", "roi", "count"]
-      operation: gt
-      value: 0
+  - name: "TRUE"
+    rules:
+      - attribute_path: ["image", "roi", "count"]
+        operation: gt
+        value: 0
 
-- name: "Subtractive"
-  absolute: false
-  type: subtractive
-  rules:
-    - attribute_path: ["image", "roi","count"]
-      operation: gt
-      value: 0
+  - name: "Subtractive"
+    absolute: false
+    type: subtractive
+    rules:
+      - attribute_path: ["image", "roi","count"]
+        operation: gt
+        value: 0
 
-- name: "UselessAND_TRUE"
-  rules:
-    - attribute_path: ["image", "roi", "shape", "strokecolor"]
-      operation: eq
-      value: 255
-    - attribute_path: ["image", "roi", "shape", "count"]
-      operation: eq
-      value: 1
+  - name: "UselessAND_TRUE"
+    rules:
+      - attribute_path: ["image", "roi", "shape", "strokecolor"]
+        operation: eq
+        value: 255
+      - attribute_path: ["image", "roi", "shape", "count"]
+        operation: eq
+        value: 1
 
-- name: "InherentlyFalseAND"
-  rules:
-    - attribute_path: ["image", "roi", "shape", "strokecolor"]
-      operation: eq
-      value: 255
-    - attribute_path: ["image", "roi", "shape", "strokecolor"]
-      operation: eq
-      value: 254
+  - name: "InherentlyFalseAND"
+    rules:
+      - attribute_path: ["image", "roi", "shape", "strokecolor"]
+        operation: eq
+        value: 255
+      - attribute_path: ["image", "roi", "shape", "strokecolor"]
+        operation: eq
+        value: 254
 
-- name: "DescriptionTest"
-  rules:
-    - attribute_path: ["image", "descriptions"]
-      operation: match
-      value: ".*test.*"
+  - name: "DescriptionTest"
+    rules:
+      - attribute_path: ["image", "descriptions"]
+        operation: match
+        value: ".*test.*"
 
-- name: "PhysicalSizeTest"
-  rules:
-    - attribute_path: ["image", "primarypixel", "physicalsizex"]
-      operation: eq
-      value: 1000
-    - attribute_path: ["image", "primarypixel", "physicalsizey"]
-      operation: eq
-      value: 1000
-    - attribute_path: ["image", "primarypixel", "physicalsizex", "unit", "name"]
-      operation: eq
-      value: "MICROMETER"
+  - name: "PhysicalSizeTest"
+    rules:
+      - attribute_path: ["image", "primarypixel", "physicalsizex"]
+        operation: eq
+        value: 1000
+      - attribute_path: ["image", "primarypixel", "physicalsizey"]
+        operation: eq
+        value: 1000
+      - attribute_path: ["image", "primarypixel", "physicalsizex", "unit", "name"]
+        operation: eq
+        value: "MICROMETER"
