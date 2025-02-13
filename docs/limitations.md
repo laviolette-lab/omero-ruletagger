@@ -1,4 +1,3 @@
-
 # Known Limitations
 * Currently impossible to add arguments to the model walk
   * For example a you can't filter a condition to only check annotations in a certain namespace

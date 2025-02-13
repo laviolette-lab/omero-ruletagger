@@ -7,7 +7,8 @@ It works by walking the omero model as described by the omero-py wrappers and th
 
 
 ## Quick Links
-- [Getting Started](getting_started.md): Template for getting up and running.
-- [Rule File](rules.md): In depth explanation of the rules.yml file.
-- [Scheduling](scheduling.md): Describes some common patterns for running regularly.
-- [Limitations](limitations.md): Describes some known limitations of this tool.
+
+* [Getting Started](getting_started.md): Template for getting up and running.
+* [Rule File](rules.md): In depth explanation of the rules.yml file.
+* [Scheduling](scheduling.md): Describes some common patterns for running regularly.
+* [Limitations](limitations.md): Describes some known limitations of this tool.

@@ -89,6 +89,7 @@ It is split by underscores as defined in the capture regex. The file extension i
 
 ## Schemas
 OMERO.RuleTagger currently has two nearly identical schemas.
+
 * v0
     * v0 is the schema from the original implementation, with some goodies added during the refactor.
 * v1

@@ -61,12 +61,13 @@ omero-ruletagger run rules.yml -O "Image:123" -s localhost -u username -w passwo
 
 ## Connection Options
 Tries to copy the OMERO cli connection options
-- `-s, --server`: OMERO server hostname
-- `-p, --port`: Server port
-- `-u, --user`: Username
-- `-w, --password`: Password
-- `-k, --key`: Session key
-- `-S, --secure`: Use secure connection
+
+* `-s, --server`: OMERO server hostname
+* `-p, --port`: Server port
+* `-u, --user`: Username
+* `-w, --password`: Password
+* `-k, --key`: Session key
+* `-S, --secure`: Use secure connection
 
 
-### See the [Rules Documentation](rules.md) to build your own rules.yml file!
+See the [Rules Documentation](rules.md) to build your own rules.yml file!

@@ -11,11 +11,7 @@ plugins:
 
 nav:
   - Home: index.md
-  - Getting Started: 
-    - Installation: installation.md
-    - Requirements: requirements.md
-  - Usage: usage.md
-  - Tagging Rules:
-    - Attribute-Based Tagging: attribute.md 
-    - Capture-Based Tagging: capture.md 
-  - Python Patch Script: patch.md
+  - Getting Started: getting_started.md
+  - Rules File: rules.md
+  - Scheduling: scheduling.md
+  - Limitations: limitations.md
