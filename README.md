@@ -157,6 +157,6 @@ This project is licensed under the MIT License - see the [`LICENSE.txt`](LICENSE
 
 ## Links
 
-- [Documentation](https://github.com/laviolette-lab/omero-ruletagger#readme)  
+- [Documentation](https://omero-ruletagger.readthedocs.io/en/stable/)  
 - [Source Code](https://github.com/laviolette-lab/omero-ruletagger)  
 - [Issue Tracker](https://github.com/laviolette-lab/omero-ruletagger/issues)
