@@ -46,8 +46,11 @@ packages = ["src/omero_ruletagger"]
 
 [tool.hatch.env]
 requires = [
-    "hatch-pip-compile"
+    "hatch-pip-compile",
+    "uv"
 ]
+pip-compile-resolver = "uv"
+pip-compile-installer = "uv"
 
 [tool.hatch.envs.default]
 type = "pip-compile"
