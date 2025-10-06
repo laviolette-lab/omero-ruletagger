@@ -8,9 +8,9 @@ COPY . /app/
 RUN chown -R coder:coder /app
 
 RUN pip3 install --no-cache-dir hatch
+ENV HATCH_ENV=default
 
 FROM base AS hatch
-ENV HATCH_ENV=default
 ENTRYPOINT ["hatch", "run"]
 
 FROM base AS prod
