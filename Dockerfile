@@ -10,13 +10,6 @@ RUN chown -R coder:coder /app
 RUN pip3 install --no-cache-dir hatch
 ENV HATCH_ENV=default
 
-FROM base AS hatch
-ENTRYPOINT ["hatch", "run"]
-
-FROM base AS prod
-RUN hatch run build && pip3 install --no-cache-dir /app/dist/*.whl 
-USER coder
-
 FROM base AS dev
 ENV PATH=/home/coder/.local/bin:$PATH
 
@@ -26,4 +19,12 @@ RUN apt-get update && apt-get install -y sudo \
     && chmod 0440 /etc/sudoers.d/coder \
     && pip3 install --no-cache-dir hatch \
     && if [ -d requirements ]; then find requirements -name "requirement*.txt" -print0 | xargs -0 -r -I{} pip3 install -r "{}"; fi
+USER coder
+
+
+FROM base AS hatch
+ENTRYPOINT ["hatch", "run"]
+
+FROM base AS prod
+RUN hatch run build && pip3 install --no-cache-dir /app/dist/*.whl 
 USER coder
