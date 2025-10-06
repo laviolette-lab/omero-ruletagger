@@ -1,12 +1,12 @@
-ARG OMEROPY_VERSION=1.1.5-python3.10
-FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION as base
-
+# ARG OMEROPY_VERSION=1.1.5-python3.10
+# FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION as base
+FROM python:3.11.13-bookworm
 RUN groupadd --gid 1000 vscode \
     && useradd --uid 1000 --gid 1000 -m vscode \
     && apt-get update && apt-get install -y sudo \
     && usermod -aG sudo vscode \
     && printf "vscode ALL=(ALL) NOPASSWD:ALL\n" > /etc/sudoers.d/vscode \
-    && \n+  chmod 0440 /etc/sudoers.d/vscode
+    &&  chmod 0440 /etc/sudoers.d/vscode
 
 WORKDIR /app
 COPY . /app/
