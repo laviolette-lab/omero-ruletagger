@@ -49,12 +49,13 @@ requires = [
     "hatch-pip-compile",
     "uv"
 ]
-pip-compile-resolver = "uv"
-pip-compile-installer = "uv"
 
 [tool.hatch.envs.default]
+installer = "uv"
 type = "pip-compile"
 pip-compile-hashes = true
+pip-compile-resolver = "uv"
+pip-compile-installer = "uv"
 dependencies = []
 
 [tool.hatch.envs.default.scripts]
