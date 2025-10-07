@@ -10,16 +10,6 @@ RUN chown -R coder:coder /app
 RUN pip3 install --no-cache-dir hatch
 ENV HATCH_ENV=default
 
-FROM base AS dev
-ENV PATH=/home/coder/.local/bin:$PATH
-
-RUN apt-get update && apt-get install -y sudo curl \
-    && usermod -aG sudo coder \
-    && printf "coder ALL=(ALL) NOPASSWD:ALL\n" > /etc/sudoers.d/coder \
-    && chmod 0440 /etc/sudoers.d/coder \
-    && if [ -d requirements ]; then find requirements -name "requirement*.txt" -print0 | xargs -0 -r -I{} pip3 install -r "{}"; fi
-USER coder
-
 FROM base AS hatch
 ENTRYPOINT ["hatch", "run"]
 
@@ -36,4 +26,13 @@ RUN hatch env run build \
     && echo "Installing zeroc-ice wheel for arch=$arch: $url" \
     && pip3 install --no-cache-dir "$url" \
     && pip3 install --no-cache-dir /app/dist/*.whl
+USER coder
+
+FROM base AS dev
+ENV PATH=/home/coder/.local/bin:$PATH
+RUN apt-get update && apt-get install -y sudo curl \
+    && usermod -aG sudo coder \
+    && printf "coder ALL=(ALL) NOPASSWD:ALL\n" > /etc/sudoers.d/coder \
+    && chmod 0440 /etc/sudoers.d/coder \
+    && if [ -d requirements ]; then find requirements -name "requirement*.txt" -print0 | xargs -0 -r -I{} pip3 install -r "{}"; fi
 USER coder
