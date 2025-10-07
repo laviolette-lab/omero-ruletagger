@@ -24,5 +24,16 @@ FROM base AS hatch
 ENTRYPOINT ["hatch", "run"]
 
 FROM base AS prod
-RUN hatch env run build && pip3 install --no-cache-dir /app/dist/*.whl 
+RUN hatch env run build \
+    && arch="$(uname -m)" \
+    && if [ "$arch" = "x86_64" ]; then \
+    url="https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp311-cp311-manylinux_2_28_x86_64.whl"; \
+    elif [ "$arch" = "aarch64" ] || [ "$arch" = "arm64" ]; then \
+    url="https://github.com/glencoesoftware/zeroc-ice-py-linux-aarch64/releases/download/20240620/zeroc_ice-3.6.5-cp311-cp311-manylinux_2_28_aarch64.whl"; \
+    else \
+    echo "Unsupported architecture: $arch" >&2; exit 1; \
+    fi \
+    && echo "Installing zeroc-ice wheel for arch=$arch: $url" \
+    && pip3 install --no-cache-dir "$url" \
+    && pip3 install --no-cache-dir /app/dist/*.whl
 USER coder
