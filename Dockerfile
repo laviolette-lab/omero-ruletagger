@@ -13,7 +13,7 @@ ENV HATCH_ENV=default
 FROM base AS dev
 ENV PATH=/home/coder/.local/bin:$PATH
 
-RUN apt-get update && apt-get install -y sudo \
+RUN apt-get update && apt-get install -y sudo curl \
     && usermod -aG sudo coder \
     && printf "coder ALL=(ALL) NOPASSWD:ALL\n" > /etc/sudoers.d/coder \
     && chmod 0440 /etc/sudoers.d/coder \
