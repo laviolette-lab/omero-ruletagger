@@ -34,6 +34,7 @@ It is split by underscores as defined in the capture regex. The file extension i
 - name: "PhysicalSizeTest"
   absolute: True
   type: additive
+  group: "MyTagGroup"
   rules:
     - attribute_path: ["image", "primarypixel", "physicalsizex"]
       operation: eq
@@ -51,6 +52,11 @@ It is split by underscores as defined in the capture regex. The file extension i
 
 * __Name__
     * The name option is required and defines the what the tag will be called.
+* __Group__
+    * The group option is optional and allows you to organize tags into tagsets (groups).
+    * When specified, the tag will be automatically linked to a tagset with the given name.
+    * If the tagset doesn't exist, it will be created automatically.
+    * Multiple tags can share the same group name to organize related tags together.
 * __Absolute__
     * Tags are absolute by default. This means that if the conditions evaluate to False, then the object will be untagged if it is already tagged.
 * __Type__

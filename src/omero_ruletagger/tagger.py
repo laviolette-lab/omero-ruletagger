@@ -161,12 +161,19 @@ class OmeroRuleTagger:  # pylint: disable=too-many-instance-attributes
             tag_name = rule["name"]
             remove = rule["remove"]
             absolute = rule["absolute"]
+            group_name = rule.get("group", None)
 
             # Check if any condition chain is satisfied using cached results
             applies = self._check_conditions(rule["conditions"], path_results)
 
             # Get or create tag
             tag = self._get_tag(gid, tag_name, remove)
+
+            # Get or create tagset (group) and link tag to it
+            if tag and group_name and not remove:
+                tagset = self._get_or_create_tagset(gid, group_name)
+                if tagset and not self.dry_run:
+                    self._link_tag_to_tagset(tag, tagset)
 
             # Apply tag or track for dry run
             if self.dry_run:
@@ -336,6 +343,74 @@ class OmeroRuleTagger:  # pylint: disable=too-many-instance-attributes
         if not self.dry_run:
             tag.save()
         return tag
+
+    def _get_or_create_tagset(
+        self, gid: int, tagset_name: str
+    ) -> Optional[TagAnnotationWrapper]:
+        """
+        Get or create a tagset (a tag that can contain other tags).
+
+        Parameters
+        ----------
+        gid : int
+            ID of the group to get the tagset from.
+        tagset_name : str
+            Name of the tagset to get or create.
+
+        Returns
+        -------
+        omero.gateway.TagAnnotationWrapper
+            The tagset tag
+        """
+        gid = self._logic.ensure_unwrapped(gid)
+        group_tag_map = self.tag_map.get(gid, {})
+
+        # Check if tagset already exists in our map
+        if tagset_name in group_tag_map:
+            return group_tag_map[tagset_name]
+
+        # Check if tagset exists in OMERO (not created by autotagger)
+        existing_tagsets = self.conn.getObjects(
+            "TagAnnotation", opts={"group": gid}, attributes={"textValue": tagset_name}
+        )
+        for tagset in existing_tagsets:
+            group_tag_map.update({tagset_name: tagset})
+            return tagset
+
+        # Create new tagset
+        logging.info("Creating tagset %s", tagset_name)
+        tagset = TagAnnotationWrapper(self.conn)
+        tagset.setValue(tagset_name)
+        tagset.setDescription(self.DESCRIPTION)
+        if not self.dry_run:
+            tagset.save()
+        group_tag_map.update({tagset_name: tagset})
+        return tagset
+
+    def _link_tag_to_tagset(
+        self, tag: TagAnnotationWrapper, tagset: TagAnnotationWrapper
+    ):
+        """
+        Link a tag to a tagset (group).
+
+        Parameters
+        ----------
+        tag : TagAnnotationWrapper
+            The tag to link to the tagset
+        tagset : TagAnnotationWrapper
+            The tagset to link the tag to
+        """
+        # Check if tag is already linked to tagset
+        if tag.getId():
+            for linked_tag in tagset.listAnnotations():
+                if linked_tag.id == tag.id:
+                    return
+
+            # Link tag to tagset
+            tagset.linkAnnotation(tag)
+            logging.info(
+                "Linked tag %s to tagset %s", tag.getTextValue(), tagset.getTextValue()
+            )
 
     def match_group(self, obj: BlitzObjectWrapper):
         """
