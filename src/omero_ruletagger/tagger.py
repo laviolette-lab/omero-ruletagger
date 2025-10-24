@@ -400,17 +400,20 @@ class OmeroRuleTagger:  # pylint: disable=too-many-instance-attributes
         tagset : TagAnnotationWrapper
             The tagset to link the tag to
         """
-        # Check if tag is already linked to tagset
-        if tag.getId():
-            for linked_tag in tagset.listAnnotations():
-                if linked_tag.id == tag.id:
-                    return
+        # Ensure tag is saved before linking
+        if not tag.getId():
+            tag.save()
 
-            # Link tag to tagset
-            tagset.linkAnnotation(tag)
-            logging.info(
-                "Linked tag %s to tagset %s", tag.getTextValue(), tagset.getTextValue()
-            )
+        # Check if tag is already linked to tagset
+        for linked_tag in tagset.listAnnotations():
+            if linked_tag.id == tag.id:
+                return
+
+        # Link tag to tagset
+        tagset.linkAnnotation(tag)
+        logging.info(
+            "Linked tag %s to tagset %s", tag.getTextValue(), tagset.getTextValue()
+        )
 
     def match_group(self, obj: BlitzObjectWrapper):
         """
