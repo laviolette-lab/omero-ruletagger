@@ -139,7 +139,7 @@ class OmeroRuleTagger:  # pylint: disable=too-many-instance-attributes
                 tags = [rule["format"].format(*tags)]
 
             for tag_name in tags:
-                if str(tag_name) in [str(x) for x in rule["blacklist"]]:
+                if any(re.fullmatch(str(x), str(tag_name)) for x in rule["blacklist"]):
                     continue
                 tag = self._get_tag(obj.getDetails().group.id, tag_name, False)
                 if self.dry_run:
