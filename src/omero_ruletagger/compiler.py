@@ -149,6 +149,7 @@ class Schema0Compiler:  # pylint: disable=too-many-instance-attributes
             "format",
             "type",
             "absolute",
+            "group",
         }
         extra_keys = set(rule.keys()) - allowed_keys
         if extra_keys:
@@ -355,6 +356,7 @@ class Schema0Compiler:  # pylint: disable=too-many-instance-attributes
                 "name": tag_rule["name"],
                 "remove": remove,
                 "absolute": tag_rule.get("absolute", True),
+                "group": tag_rule.get("group", None),
             }
         )
 

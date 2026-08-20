@@ -90,12 +90,14 @@ Create a YAML file defining your tagging rules. Example:
     - 1
 
 - name: "FALSE"
+  group: "ExampleTags"
   rules:
     - attribute_path: ["image", "roicount"]
       operation: lt
       value: 1
 
 - name: "TRUE"
+  group: "ExampleTags"
   rules:
     - attribute_path: ["image", "roi", "count"]
       operation: gt
